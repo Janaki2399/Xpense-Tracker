@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Calculator</title>
+
+  <link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+  crossorigin="anonymous"
+  />
+
+  <script
+			defer
+			src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"
+			integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP"
+			crossorigin="anonymous"
+		></script>
+
+</head>
+<body>
+  <!--for nav bar -->
+  <nav class="navbar navbar-dark bg-dark">
+    <span class="navbar-brand mb-0 h1">Expense Tracker</span>
+    <span class="navbar-brand mb-0 h1" id="heading"></span>
+  </nav>
+
+  <div class="container-fluid bg-light" style="min-height: 100vh">
+    <div class="container">
+      <div class="container">
+        
+				<div class="jumbotron mt-4">
+					<div class="input-group mb-3">
+            
+						<input
+              type="text"
+              id="getAmount"
+							class="form-control"
+							placeholder="Amount spent"
+							aria-label="Amount spent"
+							aria-describedby="spent in rupee"
+						/>
+						<div class="input-group-append">
+							<span class="input-group-text" id="spent in rupee">₹</span>
+						</div>
+					</div>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+							<span class="input-group-text" id="spent at">@</span>
+						</div>
+						<input
+              type="text"
+              id="getDesc"
+							class="form-control"
+							placeholder="spent On"
+							aria-label="spent On"
+							aria-describedby="spent at"
+						/>
+						<div class="input-group-append">
+							<button class="btn btn-outline-primary" type="button" id="getButton">Add</button>
+						</div>
+					</div>
+				</div>
+        <div>
+					<ul class="list-group" id="table">
+          </div>
+    </div>
+    
+  </div>
+  
+  <script>
+    const element=document.querySelector("#getButton");
+    const getAmount=document.querySelector("#getAmount");
+    const getDesc=document.querySelector("#getDesc");
+    const heading=document.querySelector("#heading");
+    const table=document.querySelector("#table");
+
+    let totalExpense=0;
+    heading.textContent=totalExpense;
+
+    let AllExpense=[]; 
+    function addExpense()  //on click
+    {
+    const ExpenseObject={}; //creating object
+
+    const val=getAmount.value; //reading value
+    const desc=getDesc.value;
+
+    const txtAmount=parseInt(val,10);//converting it to number
+
+    ExpenseObject.desc=desc;
+    ExpenseObject.val=txtAmount;
+    ExpenseObject.moment= new Date();
+
+    AllExpense.push(ExpenseObject); //pushing it to array
+
+    totalExpense= totalExpense+txtAmount;
+
+    
+    const someText=`Total  ${totalExpense}`
+    heading.textContent=someText ; //setting the text 
+
+    const ExpenseObjectArray =AllExpense.map(exp =>createTable(exp));        
+        //return array of strings
+
+    //to convert it to string using join
+
+    const joinedAllExpenses=ExpenseObjectArray.join(" ");
+
+    table.innerHTML=joinedAllExpenses;
+
+    getAmount.value="";
+    getDesc.value="";
+    }
+
+    element.addEventListener("click",addExpense,false);
+    function getDateString(moment)
+    {
+      return moment.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',})
+    }
+    function deleteButton(dateValue,val)
+    {
+      const newArray=[]
+      for(let i=0;i<AllExpense.length;i++)
+      {
+          if(AllExpense[i].moment.valueOf()!== dateValue)
+          {
+            newArray.push(AllExpense[i]);
+          }
+      }
+    const ExpenseObjectArray =newArray.map(exp =>createTable(exp));  
+    const joinedAllExpenses=ExpenseObjectArray.join(" ");
+
+    table.innerHTML=joinedAllExpenses;
+    
+
+      AllExpense=newArray;
+    totalExpense= totalExpense-val; //updating the value
+    const someText=`Total  ${totalExpense}`
+    heading.textContent=someText ; //setting the text 
+
+    }
+
+    function createTable({desc,val,moment})
+    {
+      return `
+      <li class="list-group-item d-flex justify-content-between">
+							<div class="d-flex flex-column">
+								${desc}
+								<small class="text-muted">${getDateString(moment)}</small>
+							</div>
+							<div>
+								<span class="px-5">
+                  ${val}
+								</span>
+                <button 
+                onclick="deleteButton(${moment.valueOf()},${val})"
+                type="button"
+                 class="btn btn-outline-danger btn-sm">
+									<i class="fas fa-trash-alt"></i>  
+								</button>
+							</div>
+			</li>`
+    }
+  </script>
+</body>
+</html>
